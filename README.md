@@ -59,10 +59,10 @@ Please follow the common contribution rules!
 ## Thanks
 
 <a href="https://www.udacity.com/">
-  <img src="https://d20vrrgs8k4bvw.cloudfront.net/images/open-graph/udacity.png" alt="udacity" width="192" height="42">
+  <img src="https://d20vrrgs8k4bvw.cloudfront.net/images/open-graph/udacity.png" alt="udacity" width="80" height="42">
 </a>
 <a href="https://github.com/hamidkhbl">
-  <img src="https://avatars2.githubusercontent.com/u/35466381?s=460&u=fc6318e6bf181d8d14635476e2cce9d6315d9b63&v=4" alt="hamidgithub" width="192" height="42">
+  <img src="https://avatars2.githubusercontent.com/u/35466381?s=460&u=fc6318e6bf181d8d14635476e2cce9d6315d9b63&v=4" alt="hamidgithub" width="42" height="42">
 </a>
 
 Thanks to [Hamid Khodabandehloo](https://github.com/hamidkhbl) for insightfull conversations, and the team at [Udacity](https://www.udacity.com/) for the great nanodegree course.
