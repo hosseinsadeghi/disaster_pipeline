@@ -25,7 +25,7 @@ To get started, there are several options:
 - Clone the repo: `git clone https://github.com/hosseinsadeghi/disaster_pipeline.git`
 - Fork the repot and open in GitPod.
 
-Read the [instruction](### Instructions).
+Read the section below.
 
 ### Instructions:
 1. Install repos in requirements.txt. The code is tested for python >=3.6
