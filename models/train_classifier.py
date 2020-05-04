@@ -15,11 +15,21 @@ from sklearn.model_selection import train_test_split
 from sklearn.base import BaseEstimator, TransformerMixin
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
+import logging
 
 nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
 nltk.download('averaged_perceptron_tagger')
+
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s %(levelname)-8s %(message)s', 
+                    datefmt='%Y-%m-%d %H:%M:%S',
+                    handlers=[
+                        logging.FileHandler("logs"),
+                        logging.StreamHandler()
+])
 
 
 
@@ -130,13 +140,13 @@ def build_model():
 
     params = {
         'features__vect__ngram_range': [(1, 1), (1, 2), (1, 3)],
-#         'features__vect__max_df': [0.5, 0.75, 1.0],
-#         'features__vect__use_idf': [True, False],
-#         'features__vect__max_features': [100],
-#         'features__vect__max_features': [None, 5000, 10000],
-#         'clf__n_estimators': [50, 100, 200],
-#         'clf__max_depth': [None, 10, 20],
-#         'clf__min_samples_split': [2, 3, 4],
+        'features__vect__max_df': [0.5, 0.75, 1.0],
+        'features__vect__use_idf': [True, False],
+        'features__vect__max_features': [100],
+        'features__vect__max_features': [None, 5000, 10000],
+        'clf__n_estimators': [50, 100, 200],
+        'clf__max_depth': [None, 10, 20],
+        'clf__min_samples_split': [2, 3, 4],
     }
     return GridSearchCV(pipeline, params)
 
@@ -158,25 +168,25 @@ def save_model(model, model_filepath):
 def main():
     if len(sys.argv) == 3:
         database_filepath, model_filepath = sys.argv[1:]
-        print('Loading data...\n    DATABASE: {}'.format(database_filepath))
+        logging.info('Loading data...\n    DATABASE: {}'.format(database_filepath))
         X_train, X_test, Y_train, Y_test = load_data(database_filepath)
         category_names = Y_train.columns
-        print('Building model...')
+        logging.info('Building model...')
         model = build_model()
         
-        print('Training model...')
+        logging.info('Training model...')
         model.fit(X_train, Y_train)
         
-        print('Evaluating model...')
+        logging.info('Evaluating model...')
         evaluate_model(model, X_test, Y_test, category_names)
 
-        print('Saving model...\n    MODEL: {}'.format(model_filepath))
+        logging.info('Saving model...\n    MODEL: {}'.format(model_filepath))
         save_model(model, model_filepath)
 
-        print('Trained model saved!')
+        logging.info('Trained model saved!')
 
     else:
-        print('Please provide the filepath of the disaster messages database '\
+        logging.exception('Please provide the filepath of the disaster messages database '\
               'as the first argument and the filepath of the pickle file to '\
               'save the model to as the second argument. \n\nExample: python '\
               'train_classifier.py ../data/DisasterResponse.db classifier.pkl')
