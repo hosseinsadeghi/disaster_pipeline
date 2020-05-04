@@ -1,2 +1,6 @@
 *.db
 *.pyc
+logs
+data/logs
+models/logs
+venv
