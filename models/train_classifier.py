@@ -13,8 +13,11 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.multioutput import MultiOutputClassifier
+from sklearn.svm import LinearSVC
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
+from sklearn.preprocessing import Normalizer
 import logging
 
 nltk.download('punkt')
@@ -52,7 +55,7 @@ def load_data(database_filepath):
     df = df.loc[df.isnull().mean(1) < 0.5]
 
     X = df['message']
-    Y = df.drop(['id', 'message', 'genre'], axis=1)
+    Y = df.drop(['id', 'message', 'genre', 'child_alone'], axis=1)
     Y = Y.applymap(lambda x: 1 if x >= 1 else 0)
     return train_test_split(X, Y, test_size=0.2)
 
@@ -74,60 +77,6 @@ def tokenize(text):
     return tokens
 
 
-class StartingVerbExtractor(BaseEstimator, TransformerMixin):
-    """
-    A class to handles transforamtion of text to a boolean that indicates the first word is a verb
-    """
-    def starting_verb(self, text):
-        """
-        Given a text, determine if the first word is a verb
-        
-        Parameters:
-        text (str): Input string
-        
-        Returns:
-        boolean: Wether the first word is a verb
-        
-        """
-       
-        sentence_list = nltk.sent_tokenize(text)
-        for sentence in sentence_list:
-            pos_tags = nltk.pos_tag(tokenize(sentence))
-            if len(pos_tags) == 0:
-                continue
-            first_word, first_tag = pos_tags[0]
-            if first_tag in ['VB', 'VBP'] or first_word == 'RT':
-                return True
-        return False
-
-    def fit(self, x, y=None):
-        return self
-
-    def transform(self, X):
-        X_tagged = pd.Series(X).apply(self.starting_verb)
-        return pd.DataFrame(X_tagged)
-
-
-class TextLengthExtractor(BaseEstimator, TransformerMixin):
-    """
-    A class that handles transformation of data to an integer the size of text
-    """
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, X):
-        """
-        Function that takes an input Panda.Series and returns a new dataframe with the length of the text entries
-        
-        Parameters:
-        X (pandas.Series): Input series of string
-        
-        Returns:
-        pandas.DataFrame: A dataframe with a single column holding the length of each entry in X
-        """
-        return pd.DataFrame(X.apply(lambda x: len(x)).values)
-
-
 def build_model():
     """
     Function to build the full training, parameter search, and cross validation pipeline
@@ -136,24 +85,17 @@ def build_model():
     GridSearchCV instance with a full test extraction and random forest classifier
     """
     pipeline = Pipeline([
-        ('features', FeatureUnion([
-            ('vect', TfidfVectorizer(tokenizer=tokenize)),
-            ('verb', StartingVerbExtractor()),
-            ('length_extractor', TextLengthExtractor()),
-        ])),
-        ('clf', RandomForestClassifier(class_weight='balanced', n_jobs=-1))
+        ('vect', TfidfVectorizer(tokenizer=tokenize, use_idf=True)),
+        ('sc', Normalizer()),
+        ('clf', MultiOutputClassifier(LinearSVC(class_weight='balanced', max_iter=10000)))
     ])
 
     params = {
-        'features__vect__ngram_range': [(1, 1), (1, 2)],
-        'features__vect__max_df': [0.5, 0.75, 1.0],
-        'features__vect__use_idf': [True, False],
-        'features__vect__max_features': [100, 200, 500],
-        'clf__n_estimators': [50, 100, 200],
-        'clf__max_depth': [None, 10, 20],
-        'clf__min_samples_split': [2, 3, 4],
+        'vect__ngram_range': [(1, 1), (1, 2)],
+        'vect__max_df': [0.25, 0.5, 1.0],
     }
-    return GridSearchCV(pipeline, params, n_jobs=-1)
+    return GridSearchCV(pipeline, param_grid=params, scoring='f1_macro', n_jobs=-1)
+
 
 
 def evaluate_model(model, xtest, ytest, labels):
@@ -167,11 +109,8 @@ def evaluate_model(model, xtest, ytest, labels):
     lables (list[str]): The list of labels for each class
     """
     ypred = model.predict(xtest)
-
-    for idx, label in enumerate(labels.values):
-        report_test = classification_report(ytest.values[:, idx], ypred[:, idx])
-        print(idx, label, '\n', report_test)
-
+    report_test = classification_report(ytest.values, ypred, target_names=labels.values)
+    print(report_test)
 
 
 def save_model(model, model_filepath):
