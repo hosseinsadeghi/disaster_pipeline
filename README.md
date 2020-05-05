@@ -14,6 +14,7 @@
 ## Table of contents
 
 - [Quick start](#quick-start)
+- [Summary](#summary)
 - [Contributing](#contributing)
 - [Creators](#creators)
 - [Thanks](#thanks)
@@ -29,19 +30,34 @@ Read the section below.
 
 ### Instructions:
 1. Install repos in requirements.txt. The code is tested for python >=3.6
+
 `pip install -r requirements.txt`
 2. Run the following commands in the project's root directory to set up your database and model.
 
     - To run ETL pipeline that cleans data and stores in database
+    
         `python data/process_data.py data/disaster_messages.csv data/disaster_categories.csv data/DisasterResponse.db`
     - To run ML pipeline that trains classifier and saves
+    
         `python models/train_classifier.py data/DisasterResponse.db models/classifier.pkl`
 
 2. Run the following command in the app's directory to run your web app.
+
     `python run.py`
 
 3. Go to http://0.0.0.0:3001/
 
+## Summary
+This project has three main components:
+- Data processing
+- Machine learning pipeline (feature selection, model selection)
+- Web application deployment
+
+In the first part of the project, the data of messages and categories is processed, merged, cleaned and saved in a database. The categories of interest all appear in one line delimited by ';'. After exctracing the categories, we can see that there are 36 labels (non-exclusive) associated with each message.
+
+A few machine learning mdoels are picked and cross validated using GridSearch over a few choice of parameters. In the end, a SVM was used as a classifier.
+
+The saved model, the result of classificaiton, is used in the web application to make predictions. The web appliation accepts an inquery and displays the predicted labels. In the main page, two graphics show a few statistics about the data.
 
 ## Contributing
 
