@@ -129,6 +129,12 @@ class TextLengthExtractor(BaseEstimator, TransformerMixin):
 
 
 def build_model():
+    """
+    Function to build the full training, parameter search, and cross validation pipeline
+    
+    Returns:
+    GridSearchCV instance with a full test extraction and random forest classifier
+    """
     pipeline = Pipeline([
         ('features', FeatureUnion([
             ('vect', TfidfVectorizer(tokenizer=tokenize)),
@@ -139,19 +145,27 @@ def build_model():
     ])
 
     params = {
-        'features__vect__ngram_range': [(1, 1), (1, 2), (1, 3)],
+        'features__vect__ngram_range': [(1, 1), (1, 2)],
         'features__vect__max_df': [0.5, 0.75, 1.0],
         'features__vect__use_idf': [True, False],
-        'features__vect__max_features': [100],
-        'features__vect__max_features': [None, 5000, 10000],
+        'features__vect__max_features': [100, 200, 500],
         'clf__n_estimators': [50, 100, 200],
         'clf__max_depth': [None, 10, 20],
         'clf__min_samples_split': [2, 3, 4],
     }
-    return GridSearchCV(pipeline, params)
+    return GridSearchCV(pipeline, params, n_jobs=-1)
 
 
 def evaluate_model(model, xtest, ytest, labels):
+    """
+    Given a model, test data, and labels, report the classification results for each label
+    
+    Parameters:
+    model (BaseEstimator): A model with `predict` method that returns an array the same size as ytest
+    xtest (pd.DataFrame): The test dataset
+    ytest (pd.DataFrame): The test labels
+    lables (list[str]): The list of labels for each class
+    """
     ypred = model.predict(xtest)
 
     for idx, label in enumerate(labels.values):
@@ -161,6 +175,13 @@ def evaluate_model(model, xtest, ytest, labels):
 
 
 def save_model(model, model_filepath):
+    """
+    Save model as pickle object
+    
+    Parameters:
+    model (BaseEstimator): model to save
+    model_filepath (str): Path to save to
+    """
     with open(model_filepath, 'wb') as file_handle:
         pickle.dump(model, file_handle)
 
