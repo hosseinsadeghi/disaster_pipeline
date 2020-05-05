@@ -10,14 +10,21 @@
 {% block content %}
     <h1 class="text-center">Result</h1>
         <ul class="list-group">
-            {% for category, classification in classification_result.items() %}
+            <div class="row">
+            {% for category, classification in classification_result %}
+                <div class="col-xs-12 col-sm-6 col-md-3 col-lg-2">
                 {% if classification == 1 %}
+                    <div class="row">
                     <li class="list-group-item list-group-item-success text-center">{{category.replace('_', ' ').title()}}</li>
+                    </div>
                 {% else %}
+                    <div class="row">
                     <li class="list-group-item list-group-item-dark text-center">{{category.replace('_', ' ').title()}}</li>
+                    </div>
                 {% endif %}
+                </div>
             {% endfor %}
-
+            </div>
         </div>
     </div>
 
