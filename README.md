@@ -62,7 +62,9 @@ This project has three main components:
 
 In the first part of the project, the data of messages and categories is processed, merged, cleaned and saved in a database. The categories of interest all appear in one line delimited by ';'. After exctracing the categories, we can see that there are 36 labels (non-exclusive) associated with each message.
 
-A few machine learning mdoels are picked and cross validated using GridSearch over a few choice of parameters. In the end, a SVM was used as a classifier.
+This data is unbalanced, to deal with the minority class, one can under-sample the majority class. There are other methods to deal with unbalanced data as well. For example, SMOTE is a well established technique. You may also refer to [this](https://github.com/hosseinsadeghi/oversampling_vae) repo for an example of using VAEs to over-sample the minority class. A gentle introduction can be found [here](https://towardsdatascience.com/oversampling-with-vaes-e410887fe51) as well.
+
+A few machine learning mdoels are picked and cross validated using GridSearch over a few choice of parameters. In the end, a SVM was used as a classifier. Because the data is multi-labeled, the classifier is wrapped in `MultiOutputClassifier`.
 
 The saved model, the result of classificaiton, is used in the web application to make predictions. The web appliation accepts an inquery and displays the predicted labels. In the main page, two graphics show a few statistics about the data.
 
