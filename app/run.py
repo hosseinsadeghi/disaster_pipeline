@@ -25,9 +25,18 @@ model_name = args.model
 
 
 def direct_mention():
+    """
+    This function goes through the data set of interest and looks at all the field in "message" column. 
+    It then counts the number of times that the category name is mentioned directly in the test.
+    
+    Returns:
+    pd.DataFrame: A dataframe with the number of times each category is mentioned directly in text 
+    """
     engine = create_engine(_sql_database)
     df = pd.read_sql('SELECT * FROM "{}"'.format(table_name), engine)
     df = df.loc[df.isnull().mean(1) < 0.5]
+    
+    # select categories columns
     cols = df.columns[3:]
     datas = []
 
@@ -43,6 +52,12 @@ def direct_mention():
 
 
 def categories_distribution():
+    """
+    This function load data from a SQL server and looks at the distribution of labels in data.
+    The data is multi-lables, therefore sum(count) > len(data)
+    Returns:
+    pd.DataFrame: A dataframe with the number of appearance of each label
+    """
     engine = create_engine(_sql_database)
     df = pd.read_sql('SELECT * FROM "{}"'.format(table_name), engine)
     df = df.loc[df.isnull().mean(1) < 0.5]
@@ -59,6 +74,16 @@ app = Flask(__name__)
 
 
 def tokenize(text):
+    """ 
+    Function that tokenizes an input text string
+    
+    Parameters:
+    text (str): Input text
+    
+    Returns:
+    list (str): List of tokens extracted from the input text
+    
+    """
     tokens = word_tokenize(text)
     lemmatizer = WordNetLemmatizer()
 
@@ -81,12 +106,10 @@ model = joblib.load(model_name)
 @app.route('/index')
 def index():
     # extract data needed for visuals
-    # TODO: Below is an example - modify to extract data for your own visuals
     y_axis = mentions_categories.values
     x_axis = list(mentions_categories.index)
     y_axis2 = categories_distribution()
     # create visuals
-    # TODO: Below is an example - modify to create your own visuals
     graphs = [
         {
             'data': [
