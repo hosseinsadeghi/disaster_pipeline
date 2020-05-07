@@ -22,9 +22,9 @@
 
 
 ## Quick start
-To get started, there are several options:
+To get started, there are two options:
 - Clone the repo: `git clone https://github.com/hosseinsadeghi/disaster_pipeline.git`
-- Fork the repot and open in GitPod.
+- Fork the repo and open in GitPod.
 
 Read the section below.
 
@@ -47,6 +47,10 @@ Read the section below.
 2. Run the following command in the app's directory to run your web app.
 
     `python run.py`
+    
+To explore more option use `-h` or `--help`. For example if using a different database name, table name, and model name you can type:
+
+`python run.py --database DATABASE --table TABLE --model MODEL`
 
 3. Go to http://0.0.0.0:3001/
 
